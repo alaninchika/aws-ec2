@@ -13,7 +13,37 @@ const stopEC2Server = (instancesId, cb) => {
 };
 
 const statusEC2Server = (instancesId, cb) => {
-    cb(null, {data: 'Hello World'});
+
+    let ec2 = new AWS.EC2();
+
+    let params = {
+        InstanceIds: [
+            instancesId
+        ]
+    };
+
+    ec2.describeInstanceStatus(params, function(err, data) {
+        if (err) {
+            console.log(err);
+            cb(err, []);
+        } else {
+
+            let results = {};
+
+            if(data && data.InstanceStatuses.length){
+                results = {
+                    id: data.InstanceStatuses[0].InstanceId,
+                    CurrentState: data.InstanceStatuses[0].InstanceState.Name
+                };
+            } else {
+                results = {
+                    CurrentState: 'stopped'
+                };
+            }
+
+            cb(null, results);
+        }
+    });
 };
 
 const buildResponse = (err, results, cb) => {
