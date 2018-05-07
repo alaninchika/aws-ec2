@@ -5,8 +5,29 @@ const axios = require('axios');
 const qs    = require('querystring');
 
 const startEC2Server = (instancesId, cb) => {
+    let ec2 = new AWS.EC2();
 
-    cb(null, {data: 'Hello World'});
+    let params = {
+        InstanceIds: [
+            instancesId
+        ]
+    };
+
+    ec2.startInstances(params, function(err, data) {
+        if (err) {
+            console.log(err);
+            cb(err, []);
+        } else {
+
+            let results = {
+                id: data.StartingInstances[0].InstanceId,
+                CurrentState: data.StartingInstances[0].CurrentState.Name,
+                PreviousState: data.StartingInstances[0].PreviousState.Name
+            };
+
+            cb(null, results);
+        }
+    });
 };
 
 const stopEC2Server = (instancesId, cb) => {
