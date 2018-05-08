@@ -18,7 +18,12 @@
     "Amazon",
     "Lambda",
     "EC2",
-    "function"
+    "function",
+    "api-gateway",
+    "aws-lambda",
+    "aws-ec2",
+    "cloudformation",
+    "microservice"
   ],
   "author": "Alan Koroma",
   "license": "MIT",
