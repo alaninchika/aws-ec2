@@ -1,0 +1,24 @@
+Transform: 'AWS::Serverless-2016-10-31'
+Parameters:
+    AWSEC2:
+        Description: "A microservice for AWS elastic compute cloud."
+        Type: "String"
+    OriginUrl:
+        Description: "The origin url to allow CORS requests from. This will be the base URL of your static SAM website."
+        Type: "String"
+Resources:
+    GetSAMPartyCount:
+        Type: AWS::Serverless::Function
+        Properties:
+            Handler: index.handler
+            Runtime: nodejs4.3
+            CodeUri: ./
+            Environment:
+                Variables:
+                    ORIGIN_URL: !Ref OriginUrl
+            Events:
+              GetResource:
+                Type: Api
+                Properties:
+                  Path: /ec2
+                  Method: get

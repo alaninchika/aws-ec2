@@ -2,7 +2,32 @@
 
 A microservice for AWS elastic compute cloud.
 
-## Usage
+### Pipeline
+The pipeline is a full CI/CD serverless pipeline for building and deploying your api. In this example we are using CloudFormation to create the pipeline, all resources, and any permissions needed.
+
+The following resources are created:
+
+- An S3 bucket to store deployment artifacts.
+- An AWS CodeBuild stage to build any changes checked into the repo.
+- The AWS CodePipeline that will watch for changes on your repo, and push these changes through to build and deployment steps.
+- All IAM roles and policies required.
+
+The CloudFormation templates being used to create these resources can be found in [pipeline directory](pipeline/).
+
+To create the pipeline stack, click the launch stack button below.
+
+[<img src="https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png">](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=myteststack&templateURL=https://awscomputeblogimages.s3-us-west-2.amazonaws.com/samfarm-main.yaml)
+
+### API
+The Serverless API we are building! The [api section](/) contains five files. 
+
+1. **[beta.json](beta.json):** The CloudFormation staging file. This will be used by CloudFormation to pass parameters to our CloudFormation template.
+2. **[buildspec.yml](buildspec.yml):** This is used by CodeBuild in the build step of our pipeline. We will get to that later.
+3. **[index.js](index.js):** The Lambda function code!
+4. **[package.json](package.json):** The package.json that defines what packages we need for our Lambda function.
+5. **[template.yaml](template.yaml):** This is the template file that will be used to create our API gateway resource and Lambda function, hook them up together
+
+### Usage
 
 The service requires the following GET query strings:
 
