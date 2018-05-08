@@ -16,7 +16,7 @@ The CloudFormation templates being used to create these resources can be found i
 
 To create the pipeline stack, click the launch stack button below.
 
-[<img src="https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png">](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=myteststack&templateURL=https://s3.amazonaws.com/cf-templates-kyd57s8qgptd-us-east-1/pipeline.yaml)
+[<img src="https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png">](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=myteststack&templateURL=https://s3.amazonaws.com/cf-templates-kyd57s8qgptd-us-east-1/main.yaml)
 
 ### API
 The Serverless API we are building! The [api section](/) contains five files. 
