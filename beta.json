@@ -1,6 +1,6 @@
 {
     "Parameters": {
-        "SamMultipler": "1",
+        "AWSEC2": "1",
         "OriginUrl": "*"
     }
 }
