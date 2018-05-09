@@ -81,6 +81,9 @@ Resources:
         - Action: ["iam:PassRole"]
           Resource: ["*"]
           Effect: Allow
+        - Action: ["iam:GetRole"]
+          Resource: ["*"]
+          Effect: Allow
         - Action: ["cloudformation:CreateChangeSet"]
           Resource: !Sub "arn:aws:cloudformation:${AWS::Region}:aws:transform/Serverless-2016-10-31"
           Effect: Allow
