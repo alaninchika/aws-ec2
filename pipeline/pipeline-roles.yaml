@@ -121,33 +121,6 @@ Resources:
           Resource: "*"
           Effect: Allow
       Roles: [!Ref CodePipelineTrustRole]
-  EC2LambdaTrustRole:
-    Description: Creating service role in IAM for AWS Lambda
-    Type: AWS::IAM::Role
-    Properties:
-      RoleName: ec2LambdaRole
-      AssumeRolePolicyDocument:
-        Statement:
-        - Effect: Allow
-          Principal:
-            Service: [lambda.amazonaws.com]
-          Action: sts:AssumeRole
-      Path: /
-  EC2LambdaPolicy:
-    Type: AWS::IAM::Policy
-    DependsOn: EC2LambdaTrustRole
-    Description: Setting IAM policy for the service role for AWS Lambda
-    Properties:
-      PolicyName: ec2RolePolicy
-      PolicyDocument:
-        Statement:
-        - Effect: Allow
-          Action: ["ec2:StartInstances", "ec2:StopInstances"]
-          Resource: ["arn:aws:ec2:*:*:instance/*"]
-        - Effect: Allow
-          Resource: ["*"]
-          Action: ["ec2:DescribeInstanceStatus"]
-      Roles: [!Ref EC2LambdaTrustRole]
 Outputs:
   CodePipelineRole:
     Description: "Role for code pipeline"
@@ -158,6 +131,3 @@ Outputs:
   CodeBuildRole:
     Description: "Role for code build to build"
     Value: !GetAtt CodeBuildTrustRole.Arn
-  EC2LambdaRole:
-    Description: "Role for code build to build"
-    Value: !GetAtt EC2LambdaTrustRole.Arn
