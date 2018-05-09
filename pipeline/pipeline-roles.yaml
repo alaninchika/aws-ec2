@@ -147,7 +147,7 @@ Resources:
         - Effect: Allow
           Resource: ["*"]
           Action: ["ec2:DescribeInstanceStatus"]
-      Roles: [!Ref EC2LambdaRole]
+      Roles: [!Ref EC2LambdaTrustRole]
 Outputs:
   CodePipelineRole:
     Description: "Role for code pipeline"
