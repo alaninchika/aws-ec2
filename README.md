@@ -3,7 +3,7 @@
 A microservice for AWS elastic compute cloud.
 
 ### Pipeline
-The pipeline is a full CI/CD serverless pipeline for building and deploying your api. In this example we are using CloudFormation to create the pipeline, all resources, and any permissions needed.
+The pipeline is a full CI/CD serverless pipeline for building and deploying your api. In this application we are using CloudFormation to create the pipeline, all resources, and any permissions needed.
 
 The following resources are created:
 
@@ -16,7 +16,7 @@ The CloudFormation templates being used to create these resources can be found i
 
 To create the pipeline stack, click the launch stack button below.
 
-[<img src="https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png">](https://console.aws.amazon.com/cloudformation/home?region=ap-southeast-2#/stacks/new?stackName=myteststack&templateURL=https://s3.amazonaws.com/cf-templates-kyd57s8qgptd-ap-southeast-2/main.yaml)
+[<img src="https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png">](https://console.aws.amazon.com/cloudformation/home?region=ap-southeast-2#/stacks/new?stackName=lambda-ec2&templateURL=https://s3.amazonaws.com/cf-templates-kyd57s8qgptd-ap-southeast-2/main.yaml)
 
 ### API
 The Serverless API we are building! The [api section](/) contains five files. 
@@ -25,7 +25,7 @@ The Serverless API we are building! The [api section](/) contains five files.
 2. **[buildspec.yml](buildspec.yml):** This is used by CodeBuild in the build step of our pipeline. We will get to that later.
 3. **[index.js](index.js):** The Lambda function code!
 4. **[package.json](package.json):** The package.json that defines what packages we need for our Lambda function.
-5. **[template.yaml](template.yaml):** This is the template file that will be used to create our API gateway resource and Lambda function, hook them up together
+5. **[template.yaml](template.yaml):** This is the template file that will be used to create our API gateway resource, Lambda function and hook them up together
 
 ### Usage
 
