@@ -44,7 +44,7 @@ Resources:
     Properties:
       Parameters:
         AppName: !Ref AppName
-      TemplateURL: "https://s3.amazonaws.com/cf-templates-kyd57s8qgptd-us-east-1/pipeline-roles.yaml"
+      TemplateURL: "https://s3.amazonaws.com/cf-templates-kyd57s8qgptd-ap-southeast-2/pipeline-roles.yaml"
   ServerlessPipeline:
     Type: "AWS::CloudFormation::Stack"
     DependsOn: [ServerlessRoles]
@@ -62,4 +62,4 @@ Resources:
         CodePipelineRole: !GetAtt ServerlessRoles.Outputs.CodePipelineRole
         CloudformationRole: !GetAtt ServerlessRoles.Outputs.CloudformationDeployRole
         CodeBuildRole: !GetAtt ServerlessRoles.Outputs.CodeBuildRole
-      TemplateURL: "https://s3.amazonaws.com/cf-templates-kyd57s8qgptd-us-east-1/pipeline.yaml"
+      TemplateURL: "https://s3.amazonaws.com/cf-templates-kyd57s8qgptd-ap-southeast-2/pipeline.yaml"
