@@ -7,22 +7,6 @@ Parameters:
         Description: "The origin url to allow CORS requests from. This will be the base URL of your static SAM website."
         Type: "String"
 Resources:
-    EC2Microservice:
-        Type: AWS::Serverless::Function
-        DependsOn: [EC2LambdaTrustRole]
-        Properties:
-            Handler: index.handler
-            Runtime: nodejs4.3
-            CodeUri: ./
-            Environment:
-                Variables:
-                    ORIGIN_URL: !Ref OriginUrl
-            Events:
-              GetResource:
-                Type: Api
-                Properties:
-                  Path: /ec2
-                  Method: get
     EC2LambdaTrustRole:
         Description: Creating service role in IAM for AWS Lambda
         Type: AWS::IAM::Role
@@ -50,3 +34,20 @@ Resources:
                 Resource: ["*"]
               Action: ["ec2:DescribeInstanceStatus"]
             Roles: [!Ref EC2LambdaTrustRole]
+    EC2Microservice:
+        Type: AWS::Serverless::Function
+        DependsOn: [EC2LambdaTrustRole]
+        Properties:
+            Handler: index.handler
+            Role: !GetAtt EC2LambdaTrustRole.Arn
+            Runtime: nodejs4.3
+            CodeUri: ./
+            Environment:
+                Variables:
+                    ORIGIN_URL: !Ref OriginUrl
+            Events:
+              GetResource:
+                Type: Api
+                Properties:
+                  Path: /ec2
+                  Method: get
