@@ -19,21 +19,17 @@ Resources:
                     Service: [lambda.amazonaws.com]
                   Action: sts:AssumeRole
             Path: /
-    EC2LambdaPolicy:
-        Type: AWS::IAM::Policy
-        DependsOn: EC2LambdaTrustRole
-        Description: Setting IAM policy for the service role for AWS Lambda
-        Properties:
-            PolicyName: ec2RolePolicy
-            PolicyDocument:
-              Statement:
-              - Effect: Allow
-                Action: ["ec2:StartInstances", "ec2:StopInstances"]
-                Resource: ["arn:aws:ec2:*:*:instance/*"]
-              - Effect: Allow
-                Resource: ["*"]
-              Action: ["ec2:DescribeInstanceStatus"]
-            Roles: [!Ref EC2LambdaTrustRole]
+            Policies:
+            - PolicyName: ec2LambdaRolePolicy
+              PolicyDocument:
+                Version: '2012-10-17'
+                Statement:
+                - Effect: Allow
+                  Action: ["ec2:StartInstances", "ec2:StopInstances"]
+                  Resource: ["arn:aws:ec2:*:*:instance/*"]
+                - Effect: Allow
+                  Action: ["ec2:DescribeInstanceStatus"]
+                  Resource: ["*"]
     EC2Microservice:
         Type: AWS::Serverless::Function
         DependsOn: [EC2LambdaTrustRole]
