@@ -32,7 +32,6 @@ Resources:
                   Resource: ["*"]
     EC2Microservice:
         Type: AWS::Serverless::Function
-        DependsOn: [EC2LambdaTrustRole]
         Properties:
             Handler: index.handler
             Role: !GetAtt EC2LambdaTrustRole.Arn
