@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: "Main template for a CI/CD Serverless application."
+Description: "AWS Elastic Compute Cloud microservice deployed to AWS Lambda and API Gateway."
 Parameters:
   AppName:
     Type: String

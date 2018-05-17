@@ -35,7 +35,7 @@ Resources:
         Properties:
             Handler: index.handler
             Role: !GetAtt EC2LambdaTrustRole.Arn
-            Runtime: nodejs4.3
+            Runtime: nodejs8.10
             CodeUri: ./
             Environment:
                 Variables:

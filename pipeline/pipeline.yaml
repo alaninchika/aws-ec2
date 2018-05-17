@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: "Template for full CI/CD serverless applications."
+Description: "Creating a deployment pipeline in AWS CodePipeline"
 Parameters:
   AppName:
     Type: String
@@ -22,7 +22,7 @@ Parameters:
     Default: beta.json
   CodeBuildImage:
     Type: String
-    Default: "aws/codebuild/nodejs:7.0.0"
+    Default: "aws/codebuild/nodejs:8.10"
     Description: Image used for CodeBuild project.
   GitHubRepoName:
     Type: String
@@ -153,7 +153,7 @@ Resources:
             Provider: CloudFormation
           OutputArtifacts: []
           Configuration:
-            StackName: !Sub "${AppName}-serverless-stack"
+            StackName: !Sub "lambda-Microservices"
             ActionMode: CHANGE_SET_REPLACE
             RoleArn: !Ref CloudformationRole
             ChangeSetName: pipeline-changeset
@@ -170,7 +170,7 @@ Resources:
             Provider: CloudFormation
           OutputArtifacts: []
           Configuration:
-            StackName: !Sub "${AppName}-serverless-stack"
+            StackName: !Sub "lambda-Microservices"
             ActionMode: CHANGE_SET_EXECUTE
             ChangeSetName: pipeline-changeset
           RunOrder: 2
