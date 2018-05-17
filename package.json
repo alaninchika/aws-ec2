@@ -4,12 +4,12 @@
   "description": "A microservice for AWS elastic compute cloud.",
   "main": "index.js",
   "directories": {
-    "test": "test"
+    "test": "tests"
   },
   "scripts": {
   	"check-coverage": "npm test && node_modules/.bin/istanbul check-coverage --statements 100 --functions 100 --lines 100 --branches 100",
     "eslint": "semistandard  --verbose | snazzy",
-    "test": "node test/test.js"
+    "test": "node tests/test.js"
   },
   "lambda_memory": 512,
   "lambda_timeout": 42,
