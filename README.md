@@ -1,7 +1,5 @@
 # AWS EC2 Microservice
 
-[![Build Status](https://travis-ci.com/alaninchika/aws-ec2.svg?branch=master)](https://travis-ci.com/alaninchika/aws-ec2)
-
 AWS Elastic Compute Cloud microservice deployed to AWS Lambda and API Gateway.
 
 ### Pipeline
