@@ -1,9 +1,9 @@
 # AWS EC2 Microservice
 
-A microservice for AWS elastic compute cloud.
+AWS Elastic Compute Cloud microservice deployed to AWS Lambda and API Gateway.
 
 ### Pipeline
-The pipeline is a full CI/CD serverless pipeline for building and deploying your api. In this application we are using CloudFormation to create the pipeline, all resources, and any permissions needed.
+The pipeline is a full CI/CD serverless pipeline for building and deploying lambda function and api. In this application we are using CloudFormation to create the pipeline, all resources, and any permissions needed.
 
 The following resources are created:
 

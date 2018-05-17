@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: Common resources for application deployed to Lambda
+Description: Creating IAM role for AWS CloudFormation
 Parameters:
   AppName:
     Type: String

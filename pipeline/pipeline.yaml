@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: "Template for full CI/CD serverless applications."
+Description: "Creating a deployment pipeline in AWS CodePipeline"
 Parameters:
   AppName:
     Type: String
