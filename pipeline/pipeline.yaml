@@ -153,7 +153,7 @@ Resources:
             Provider: CloudFormation
           OutputArtifacts: []
           Configuration:
-            StackName: !Sub "${AppName}-serverless-stack"
+            StackName: !Sub "lambda-Microservices"
             ActionMode: CHANGE_SET_REPLACE
             RoleArn: !Ref CloudformationRole
             ChangeSetName: pipeline-changeset
@@ -170,7 +170,7 @@ Resources:
             Provider: CloudFormation
           OutputArtifacts: []
           Configuration:
-            StackName: !Sub "${AppName}-serverless-stack"
+            StackName: !Sub "lambda-Microservices"
             ActionMode: CHANGE_SET_EXECUTE
             ChangeSetName: pipeline-changeset
           RunOrder: 2
