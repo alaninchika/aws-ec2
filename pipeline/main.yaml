@@ -1,14 +1,16 @@
-AWSTemplateFormatVersion: "2010-09-09"
-Description: "Main template for a CI/CD Serverless application."
+AWSTemplateFormatVersion: 2010-09-09
+Description: AWS Elastic Compute Cloud microservice deployed to AWS Lambda and API Gateway.
 Parameters:
   AppName:
     Type: String
     Description: Name of the application.
     Default: lambda-ec2
-    MinLength: "1"
-    MaxLength: "80"
-    AllowedPattern: "[A-Za-z0-9-]+"
-    ConstraintDescription: Malformed input parameter. AppName must only contain upper and lower case letters, numbers, and -.
+    MinLength: '1'
+    MaxLength: '80'
+    AllowedPattern: '[A-Za-z0-9-]+'
+    ConstraintDescription: >-
+      Malformed input parameter. AppName must only contain upper and lower case
+      letters, numbers, and -.
   TEMPLATEInputFile:
     Type: String
     Description: The filename for the TEMPLATE file.
@@ -23,7 +25,7 @@ Parameters:
     Default: beta.json
   CodeBuildImage:
     Type: String
-    Default: "aws/codebuild/nodejs:7.0.0"
+    Default: 'aws/codebuild/nodejs:7.0.0'
     Description: Image used for CodeBuild project.
   GitHubRepoName:
     Type: String
@@ -38,29 +40,448 @@ Parameters:
   GitHubToken:
     NoEcho: true
     Type: String
-    Description: "Secret. OAuthToken with access to Repo. Long string of characters and digits. Go to https://github.com/settings/tokens"
+    Description: >-
+      Secret. OAuthToken with access to Repo. Long string of characters and
+      digits. Go to https://github.com/settings/tokens
 Resources:
-  ServerlessRoles:
-    Type: "AWS::CloudFormation::Stack"
+  CodeBuildTrustRole:
+    Description: Creating service role in IAM for AWS CodeBuild
+    Type: 'AWS::IAM::Role'
     Properties:
-      Parameters:
-        AppName: !Ref AppName
-      TemplateURL: "https://s3.amazonaws.com/cf-templates-kyd57s8qgptd-ap-southeast-2/pipeline-roles.yaml"
-  ServerlessPipeline:
-    Type: "AWS::CloudFormation::Stack"
-    DependsOn: [ServerlessRoles]
+      RoleName: !Sub '${AppName}-codebuild-role'
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - codebuild.amazonaws.com
+            Action: 'sts:AssumeRole'
+      Path: /
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 5e803ea0-9171-4f9c-b272-212a626e0ce2
+  CodeBuildRolePolicy:
+    Type: 'AWS::IAM::Policy'
+    DependsOn: CodeBuildTrustRole
+    Description: Setting IAM policy for the service role for AWS CodeBuild
     Properties:
-      Parameters:
-        AppName: !Ref AppName
-        TEMPLATEInputFile: !Ref TEMPLATEInputFile
-        TEMPLATEOutputFile: !Ref TEMPLATEOutputFile
-        StagingFile: !Ref StagingFile
-        CodeBuildImage: !Ref CodeBuildImage
-        GitHubRepoName: !Ref GitHubRepoName
-        GitHubRepoBranch: !Ref GitHubRepoBranch
-        GitHubUser: !Ref GitHubUser
-        GitHubToken: !Ref GitHubToken
-        CodePipelineRole: !GetAtt ServerlessRoles.Outputs.CodePipelineRole
-        CloudformationRole: !GetAtt ServerlessRoles.Outputs.CloudformationDeployRole
-        CodeBuildRole: !GetAtt ServerlessRoles.Outputs.CodeBuildRole
-      TemplateURL: "https://s3.amazonaws.com/cf-templates-kyd57s8qgptd-ap-southeast-2/pipeline.yaml"
+      PolicyName: CodeBuildRolePolicy
+      PolicyDocument:
+        Statement:
+          - Effect: Allow
+            Action:
+              - 'logs:CreateLogGroup'
+              - 'logs:CreateLogStream'
+              - 'logs:PutLogEvents'
+            Resource:
+              - '*'
+          - Effect: Allow
+            Resource:
+              - '*'
+            Action:
+              - 's3:*'
+          - Effect: Allow
+            Resource:
+              - '*'
+            Action:
+              - 'kms:GenerateDataKey*'
+              - 'kms:Encrypt'
+              - 'kms:Decrypt'
+          - Effect: Allow
+            Resource:
+              - '*'
+            Action:
+              - 'sns:SendMessage'
+      Roles:
+        - !Ref CodeBuildTrustRole
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 4d690af2-0929-4ee7-917f-9a8f034c527d
+  CloudFormationTrustRole:
+    Description: Creating service role in IAM for AWS CloudFormation
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Sub '${AppName}-cloudformation-role'
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - cloudformation.amazonaws.com
+            Action: 'sts:AssumeRole'
+      Path: /
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: e044b4b3-3ccd-4f03-9963-41f6ba73371d
+  CloudFormationRolePolicy:
+    Type: 'AWS::IAM::Policy'
+    DependsOn: CloudFormationTrustRole
+    Description: Setting IAM policy for the service role for AWS CloudFormation
+    Properties:
+      PolicyName: CloudFormationRolePolicy
+      PolicyDocument:
+        Statement:
+          - Action:
+              - 's3:GetObject'
+              - 's3:GetObjectVersion'
+              - 's3:GetBucketVersioning'
+            Resource: '*'
+            Effect: Allow
+          - Action:
+              - 's3:PutObject'
+            Resource:
+              - 'arn:aws:s3:::codepipeline*'
+            Effect: Allow
+          - Action:
+              - 'lambda:*'
+            Resource: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:*'
+            Effect: Allow
+          - Action:
+              - 'apigateway:*'
+            Resource: !Sub 'arn:aws:apigateway:${AWS::Region}::*'
+            Effect: Allow
+          - Action:
+              - 'iam:GetRole'
+              - 'iam:CreateRole'
+              - 'iam:DeleteRole'
+              - 'iam:PassRole'
+              - 'iam:PutRolePolicy'
+              - 'iam:DeleteRolePolicy'
+            Resource: '*'
+            Effect: Allow
+          - Action:
+              - 'iam:AttachRolePolicy'
+              - 'iam:DetachRolePolicy'
+            Resource: !Sub 'arn:aws:iam::${AWS::AccountId}:role/${AppName}-*'
+            Effect: Allow
+          - Action:
+              - 'cloudformation:CreateChangeSet'
+            Resource: !Sub >-
+              arn:aws:cloudformation:${AWS::Region}:aws:transform/Serverless-2016-10-31
+            Effect: Allow
+      Roles:
+        - !Ref CloudFormationTrustRole
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: bebcf8b1-dd75-4aa0-98f0-3f8feb311ef3
+  CodePipelineTrustRole:
+    Description: Creating service role in IAM for AWS CodePipeline
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Sub '${AppName}-codepipeline-role'
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - codepipeline.amazonaws.com
+            Action: 'sts:AssumeRole'
+      Path: /
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 5d5f5bfb-fe80-4ecc-9f39-db522b4dd276
+  CodePipelineRolePolicy:
+    Type: 'AWS::IAM::Policy'
+    DependsOn: CodePipelineTrustRole
+    Description: Setting IAM policy for the service role for AWS CodePipeline
+    Properties:
+      PolicyName: CodePipelineRolePolicy
+      PolicyDocument:
+        Statement:
+          - Action:
+              - 's3:GetObject'
+              - 's3:GetObjectVersion'
+              - 's3:GetBucketVersioning'
+            Resource: '*'
+            Effect: Allow
+          - Action:
+              - 's3:PutObject'
+            Resource:
+              - 'arn:aws:s3:::codepipeline*'
+            Effect: Allow
+          - Action:
+              - 'codebuild:StartBuild'
+              - 'codebuild:BatchGetBuilds'
+            Resource: '*'
+            Effect: Allow
+          - Action:
+              - 'cloudwatch:*'
+              - 's3:*'
+              - 'sns:*'
+              - 'cloudformation:*'
+              - 'rds:*'
+              - 'sqs:*'
+              - 'iam:*'
+            Resource: '*'
+            Effect: Allow
+          - Action:
+              - 'lambda:InvokeFunction'
+              - 'lambda:ListFunctions'
+              - 'lambda:AddPermission'
+              - 'lambda:RemovePermission'
+            Resource: '*'
+            Effect: Allow
+          - Action:
+              - 'iam:GetRole'
+              - 'iam:CreateRole'
+              - 'iam:DeleteRole'
+              - 'iam:PassRole'
+              - 'iam:PutRolePolicy'
+              - 'iam:DeleteRolePolicy'
+            Resource: '*'
+            Effect: Allow
+      Roles:
+        - !Ref CodePipelineTrustRole
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: ed91ca6e-7b62-4597-b29b-28b8f6c29c69
+  CodeBuildProject:
+    DependsOn:
+      - S3Bucket
+    Description: Creating AWS CodeBuild project
+    Type: 'AWS::CodeBuild::Project'
+    Properties:
+      Artifacts:
+        Type: CODEPIPELINE
+      Description: !Sub 'Building stage for ${AppName}.'
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        EnvironmentVariables:
+          - Name: S3_BUCKET
+            Value: !Ref S3Bucket
+        Image: !Ref CodeBuildImage
+        Type: LINUX_CONTAINER
+      Name: !Sub '${AppName}-build'
+      ServiceRole: !Ref CodeBuildTrustRole
+      Source:
+        Type: CODEPIPELINE
+      Tags:
+        - Key: app-name
+          Value: !Ref AppName
+      TimeoutInMinutes: 5
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 6500fca6-2e74-4536-a396-3247e9d2ee70
+  S3Bucket:
+    Description: Creating Amazon S3 bucket for AWS CodePipeline artifacts
+    Type: 'AWS::S3::Bucket'
+    DeletionPolicy: Retain
+    Properties:
+      BucketName: !Sub 'serverless-app-${AWS::AccountId}-${AWS::Region}-${AppName}'
+      VersioningConfiguration:
+        Status: Enabled
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 235c1481-6736-44ca-9ee2-2771c4d50f7c
+  S3ArtifactBucketPolicy:
+    DependsOn:
+      - S3Bucket
+    Description: Setting Amazon S3 bucket policy for AWS CodePipeline access
+    Type: 'AWS::S3::BucketPolicy'
+    Properties:
+      Bucket: !Ref S3Bucket
+      PolicyDocument:
+        Version: 2012-10-17
+        Id: SSEAndSSLPolicy
+        Statement:
+          - Sid: DenyInsecureConnections
+            Effect: Deny
+            Principal: '*'
+            Action: 's3:*'
+            Resource: !Sub 'arn:aws:s3:::${S3Bucket}/*'
+            Condition:
+              Bool:
+                'aws:SecureTransport': false
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: e09e6455-4828-43d1-be4f-dbadc4e7c92f
+  ProjectPipeline:
+    DependsOn:
+      - S3Bucket
+      - CodeBuildProject
+    Description: Creating a deployment pipeline for your project in AWS CodePipeline
+    Type: 'AWS::CodePipeline::Pipeline'
+    Properties:
+      Name: !Sub '${AppName}-pipeline'
+      RoleArn: !GetAtt
+        - CodePipelineTrustRole
+        - Arn
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: source
+              InputArtifacts: []
+              ActionTypeId:
+                Version: '1'
+                Category: Source
+                Owner: ThirdParty
+                Provider: GitHub
+              OutputArtifacts:
+                - Name: !Sub '${AppName}-SourceArtifact'
+              Configuration:
+                Repo: !Ref GitHubRepoName
+                Branch: !Ref GitHubRepoBranch
+                OAuthToken: !Ref GitHubToken
+                Owner: !Ref GitHubUser
+              RunOrder: 1
+        - Name: Build
+          Actions:
+            - Name: build-from-source
+              InputArtifacts:
+                - Name: !Sub '${AppName}-SourceArtifact'
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Version: '1'
+                Provider: CodeBuild
+              OutputArtifacts:
+                - Name: !Sub '${AppName}-BuildArtifact'
+              Configuration:
+                ProjectName: !Sub '${AppName}-build'
+              RunOrder: 1
+        - Name: Deploy
+          Actions:
+            - Name: create-changeset
+              InputArtifacts:
+                - Name: !Sub '${AppName}-BuildArtifact'
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Version: '1'
+                Provider: CloudFormation
+              OutputArtifacts: []
+              Configuration:
+                StackName: !Sub lambda-Microservices
+                ActionMode: CHANGE_SET_REPLACE
+                RoleArn: !GetAtt
+                  - CloudFormationTrustRole
+                  - Arn
+                ChangeSetName: pipeline-changeset
+                Capabilities: CAPABILITY_NAMED_IAM
+                TemplatePath: !Sub '${AppName}-BuildArtifact::${TEMPLATEOutputFile}'
+                TemplateConfiguration: !If
+                  - HasStagingVariables
+                  - !Sub '${AppName}-BuildArtifact::${StagingFile}'
+                  - ''
+              RunOrder: 1
+            - Name: execute-changeset
+              InputArtifacts: []
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Version: '1'
+                Provider: CloudFormation
+              OutputArtifacts: []
+              Configuration:
+                StackName: !Sub lambda-Microservices
+                ActionMode: CHANGE_SET_EXECUTE
+                ChangeSetName: pipeline-changeset
+              RunOrder: 2
+      ArtifactStore:
+        Type: S3
+        Location: !Ref S3Bucket
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 180ef142-42b3-4deb-b0bf-5b21b75ecf6a
+Metadata:
+  'AWS::CloudFormation::Designer':
+    235c1481-6736-44ca-9ee2-2771c4d50f7c:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 570
+        'y': 340
+      z: 1
+      embeds: []
+    e09e6455-4828-43d1-be4f-dbadc4e7c92f:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 770
+        'y': 310
+      z: 1
+      embeds: []
+      dependson:
+        - 235c1481-6736-44ca-9ee2-2771c4d50f7c
+    5d5f5bfb-fe80-4ecc-9f39-db522b4dd276:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 150
+        'y': 290
+      z: 1
+      embeds: []
+    ed91ca6e-7b62-4597-b29b-28b8f6c29c69:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 60
+        'y': 100
+      z: 1
+      embeds: []
+      dependson:
+        - 5d5f5bfb-fe80-4ecc-9f39-db522b4dd276
+    e044b4b3-3ccd-4f03-9963-41f6ba73371d:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 300
+        'y': 90
+      z: 1
+      embeds: []
+    bebcf8b1-dd75-4aa0-98f0-3f8feb311ef3:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 480
+        'y': 90
+      z: 1
+      embeds: []
+      dependson:
+        - e044b4b3-3ccd-4f03-9963-41f6ba73371d
+    5e803ea0-9171-4f9c-b272-212a626e0ce2:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 40
+        'y': 350
+      z: 1
+      embeds: []
+    6500fca6-2e74-4536-a396-3247e9d2ee70:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 300
+        'y': 450
+      z: 1
+      embeds: []
+    180ef142-42b3-4deb-b0bf-5b21b75ecf6a:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 300
+        'y': 290
+      z: 1
+      embeds: []
+      dependson:
+        - 6500fca6-2e74-4536-a396-3247e9d2ee70
+    4d690af2-0929-4ee7-917f-9a8f034c527d:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: -80
+        'y': 150
+      z: 1
+      embeds: []
+      dependson:
+        - 5e803ea0-9171-4f9c-b272-212a626e0ce2
