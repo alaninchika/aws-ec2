@@ -1,6 +1,7 @@
 # AWS EC2 Microservice
 
 [![Build Status](https://travis-ci.com/alaninchika/aws-ec2.svg?branch=master)](https://travis-ci.com/alaninchika/aws-ec2)
+[![codecov](https://codecov.io/gh/alaninchika/alaninchika/branch/master/graph/badge.svg)](https://codecov.io/gh/alaninchika/alaninchika)
 
 AWS Elastic Compute Cloud microservice deployed to AWS Lambda and API Gateway.
 
@@ -21,7 +22,7 @@ To create the pipeline stack, click the launch stack button below.
 [<img src="https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png">](https://console.aws.amazon.com/cloudformation/home?region=ap-southeast-2#/stacks/new?stackName=lambda-ec2&templateURL=https://s3.amazonaws.com/cf-templates-kyd57s8qgptd-ap-southeast-2/main.yaml)
 
 ### API
-The Serverless API we are building! The [api section](/) contains five files. 
+The Serverless API we are building! The [api section](/) contains five files.
 
 1. **[beta.json](beta.json):** The CloudFormation staging file. This will be used by CloudFormation to pass parameters to our CloudFormation template.
 2. **[buildspec.yml](buildspec.yml):** This is used by CodeBuild in the build step of our pipeline. We will get to that later.
