@@ -3,8 +3,7 @@ sudo: false
 node_js:
   - "7.0"
 install:
-  - npm install -g codecov istanbul
+  - npm install -g codecov
 script:
   - npm test
-  - istanbul cover mocha/bin/_mocha --reporter lcovonly -- -R spec && codecov
   - codecov
