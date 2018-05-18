@@ -1,7 +1,7 @@
 # AWS EC2 Microservice
 
 [![Build Status](https://travis-ci.com/alaninchika/aws-ec2.svg?branch=master)](https://travis-ci.com/alaninchika/aws-ec2)
-[![codecov](https://codecov.io/gh/alaninchika/alaninchika/branch/master/graph/badge.svg)](https://codecov.io/gh/alaninchika/alaninchika)
+[![codecov](https://codecov.io/gh/alaninchika/aws-ec2/branch/master/graph/badge.svg)](https://codecov.io/gh/alaninchika/aws-ec2)
 
 AWS Elastic Compute Cloud microservice deployed to AWS Lambda and API Gateway.
 
