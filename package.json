@@ -9,7 +9,8 @@
   "scripts": {
   	"check-coverage": "npm test && node_modules/.bin/istanbul check-coverage --statements 100 --functions 100 --lines 100 --branches 100",
     "eslint": "semistandard  --verbose | snazzy",
-    "test": "node tests/test.js"
+    "test": "node tests/test.js",
+    "testcov": "nyc mocha"
   },
   "lambda_memory": 512,
   "lambda_timeout": 42,
@@ -39,7 +40,8 @@
     "aguid": "^2.0.0",
     "eslint": "^4.3.0",
     "git-rev": "^0.2.1",
-    "istanbul": "^0.4.5",
+    "mocha": "^5.0.1",
+    "nyc": "^11.4.1",
     "sinon": "^1.17.2",
     "tape": "^4.2.2"
   },
